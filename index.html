@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>蔵小校区ふるさと振興会</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Old+Mincho:wght@600;900&display=swap">
+<style>
+/* 構成：上部に地区名と案内メニュー、ページは「#」で切り替える。各コースは地図の座標（A-2など）と区間距離をそのまま見出しに使う */
+:root{
+  --bg:#f6f8f8;          /* 浜の朝のような、わずかに青みのある白 */
+  --surface:#ffffff;
+  --ink:#1d2a30;         /* 本文 */
+  --muted:#5b6b72;
+  --line:#d6dfe2;
+  --sea:#1f5d73;         /* 宇和海の深い青緑 */
+  --sea-soft:#e3eef1;
+  --mikan:#e0791f;       /* 段々畑のみかん色（強調は一か所に） */
+  --route:#d23a3a;       /* コースマップのメインルートの赤 */
+  --safe:#2c8a5a;        /* 避難場所の緑（地図の凡例と同じ意味） */
+  --safe-soft:#e2f2e8;
+  --warn-soft:#fff3e2;
+  --f-display:"Zen Old Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --maxw:1080px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111a1e;--surface:#17232a;--ink:#e3eaec;--muted:#9fb0b6;--line:#2b3a41;
+  --sea:#7cc0d6;--sea-soft:#1d3139;--mikan:#f39a4b;--route:#ef6b6b;--safe:#6fcf9a;--safe-soft:#1a3328;--warn-soft:#33281a;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111a1e;--surface:#17232a;--ink:#e3eaec;--muted:#9fb0b6;--line:#2b3a41;
+  --sea:#7cc0d6;--sea-soft:#1d3139;--mikan:#f39a4b;--route:#ef6b6b;--safe:#6fcf9a;--safe-soft:#1a3328;--warn-soft:#33281a;color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.85;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+a{color:var(--sea)}
+img{max-width:100%;display:block}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.35;margin:0}
+h2{font-size:clamp(1.5rem,3.2vw,2rem)}
+h3{font-size:1.2rem}
+p{margin:0}
+.wrap{max-width:var(--maxw);margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.stack{display:flex;flex-direction:column;gap:16px}
+.prose{max-width:40em}
+
+/* 試作版の帯 */
+.proto{background:var(--warn-soft);border-bottom:1px solid var(--line);font-size:.85rem}
+.proto .wrap{padding-block:6px}
+
+/* ヘッダー */
+header.site{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+header.site .wrap{display:flex;align-items:center;gap:20px;padding-block:10px;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;text-decoration:none;color:var(--ink);line-height:1.2}
+.brand b{font-family:var(--f-display);font-size:1.15rem;letter-spacing:.04em}
+.hero-org{font-size:clamp(.9rem,2vw,1.05rem);letter-spacing:.12em;opacity:.9}
+.brand small{font-size:.72rem;color:var(--muted);letter-spacing:.06em}
+nav.menu{flex:1;min-width:0;overflow-x:auto}
+nav.menu ul{display:flex;gap:4px;list-style:none;margin:0;padding:0;white-space:nowrap}
+nav.menu a{display:block;padding:6px 10px;border-radius:6px;text-decoration:none;color:var(--ink);font-size:.92rem}
+nav.menu a:hover{background:var(--sea-soft)}
+nav.menu a[aria-current="page"]{background:var(--sea);color:var(--surface)}
+:focus-visible{outline:3px solid var(--mikan);outline-offset:2px}
+
+main section.page{padding-block:40px 64px}
+main section.page[hidden]{display:none}
+.eyebrow{font-size:.78rem;letter-spacing:.14em;color:var(--sea);font-weight:700}
+.page-head{display:flex;flex-direction:column;gap:8px;margin-bottom:28px}
+.page-head p{color:var(--muted);max-width:40em}
+
+/* ホーム：夕景の写真に地区名を重ねる */
+.hero{position:relative;overflow:hidden;background:#0d2630}
+.hero img{width:100%;height:clamp(300px,56vw,560px);object-fit:cover;opacity:.92}
+.hero .over{position:absolute;inset:auto 0 0 0;background:linear-gradient(to top,rgba(8,22,28,.82),rgba(8,22,28,0));color:#fff}
+.hero .over .wrap{padding-block:72px 32px;display:flex;flex-direction:column;gap:10px}
+.hero h1{font-size:clamp(2.6rem,8vw,5rem);letter-spacing:.12em;font-weight:900}
+.hero p{font-size:clamp(1rem,2.2vw,1.2rem);max-width:30em}
+.hero .credit{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:10px;font-size:.7rem;color:rgba(255,255,255,.8)}
+
+.lead{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:start}
+.lead > *{min-width:0}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:.92rem;border-top:2px solid var(--sea);padding-top:12px}
+.facts dt{color:var(--muted)}
+.facts dd{margin:0}
+
+.course-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.ccard{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;text-decoration:none;color:var(--ink)}
+.ccard img{aspect-ratio:16/9;object-fit:cover;width:100%}
+.ccard .body{padding:16px 18px 20px;display:flex;flex-direction:column;gap:6px}
+.ccard .meta{display:flex;gap:14px;font-size:.88rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.ccard:hover h3{color:var(--sea)}
+
+.missions{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line)}
+.missions li{list-style:none;padding:18px 18px 20px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:2.2em 1fr;gap:4px 10px;min-width:0}
+.missions .num{font-family:var(--f-display);font-size:1.5rem;color:var(--mikan);line-height:1.1;grid-row:span 2}
+.missions b{font-size:1rem}
+.missions p{font-size:.9rem;color:var(--muted)}
+.missions .where{font-size:.75rem;color:var(--sea);display:block}
+
+.aerial{margin:48px 0 0;display:flex;flex-direction:column;gap:8px}
+.aerial img{width:100%;aspect-ratio:21/9;object-fit:cover;border-radius:10px}
+.aerial figcaption{font-size:.85rem;color:var(--muted)}
+@media (max-width:560px){.aerial img{aspect-ratio:4/3}}
+.block{margin-top:56px;display:flex;flex-direction:column;gap:20px}
+.block-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.more{font-size:.9rem}
+
+/* フットパス：コースごとの帯 */
+.course{border-top:4px solid var(--route);background:var(--surface);border-radius:0 0 10px 10px;padding:24px;display:flex;flex-direction:column;gap:22px;margin-top:28px}
+.course-top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-end}
+.course-top .stat{display:flex;gap:18px;font-variant-numeric:tabular-nums}
+.stat div{display:flex;flex-direction:column;line-height:1.2}
+.stat small{font-size:.72rem;color:var(--muted);letter-spacing:.08em}
+.stat strong{font-size:1.5rem;font-family:var(--f-display)}
+.mapfig{margin:0;display:flex;flex-direction:column;gap:6px}
+.mapfig button{all:unset;cursor:zoom-in;display:block;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.mapfig button:focus-visible{outline:3px solid var(--mikan)}
+.mapfig figcaption{font-size:.8rem;color:var(--muted)}
+.spots{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.spot{display:grid;grid-template-columns:3em 1fr;gap:4px 14px;padding:16px 0;border-bottom:1px dashed var(--line)}
+.spot:last-child{border-bottom:0}
+.spot .pin{width:2.4em;height:2.4em;border-radius:50%;border:2px solid var(--route);color:var(--route);display:grid;place-items:center;font-weight:700;font-variant-numeric:tabular-nums;grid-row:span 3}
+.spot h4{margin:0;font-size:1.05rem;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.grid-ref{font-size:.75rem;color:var(--muted);font-weight:400;border:1px solid var(--line);border-radius:4px;padding:0 6px}
+.spot ul{margin:0;padding-left:1.1em;font-size:.93rem}
+.leg{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font-size:.75rem;padding:1px 8px;border-radius:999px;font-weight:700}
+.tag.safe{background:var(--safe-soft);color:var(--safe)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+
+.rules{counter-reset:r;list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:10px 28px}
+.rules li{counter-increment:r;display:grid;grid-template-columns:1.8em 1fr;gap:8px;font-size:.93rem}
+.rules li::before{content:counter(r);background:var(--sea);color:var(--surface);border-radius:4px;height:1.6em;display:grid;place-items:center;font-size:.8rem;font-weight:700;margin-top:.15em}
+
+/* 防災と歴史：年表 */
+.timeline{list-style:none;margin:0;padding:0;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:22px}
+.timeline li{position:relative;padding-left:22px;display:flex;flex-direction:column;gap:4px}
+.timeline li::before{content:"";position:absolute;left:-7px;top:.55em;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--muted)}
+.timeline li.disaster::before{border-color:var(--route);background:var(--route)}
+.timeline time{font-weight:700;font-variant-numeric:tabular-nums;color:var(--sea)}
+.timeline li.disaster time{color:var(--route)}
+.timeline p{font-size:.93rem}
+.src{font-size:.75rem;color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+.two > *{min-width:0}
+.photo-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.photo-pair figure{margin:0;display:flex;flex-direction:column;gap:4px}
+.photo-pair img{aspect-ratio:4/3;object-fit:cover;border-radius:6px}
+.photo-pair figcaption{font-size:.78rem;color:var(--muted)}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:520px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.78rem;color:var(--muted);font-weight:700;background:var(--sea-soft)}
+tr:last-child td{border-bottom:0}
+.note{background:var(--safe-soft);border-radius:8px;padding:14px 16px;font-size:.9rem}
+.wisdom{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.wisdom article{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.wisdom p{font-size:.92rem}
+
+/* こよみ */
+.koyomi{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.season{background:var(--surface);padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.season h3{font-size:1.1rem;color:var(--sea)}
+.season img{aspect-ratio:4/3;object-fit:cover;border-radius:6px}
+.season dl{margin:0;display:flex;flex-direction:column;gap:8px;font-size:.9rem}
+.season dt{font-weight:700;font-variant-numeric:tabular-nums}
+.season dd{margin:0;color:var(--muted)}
+
+/* 写真 */
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.gallery figure{margin:0;display:flex;flex-direction:column;gap:4px}
+.gallery button{all:unset;cursor:zoom-in;display:block;border-radius:6px;overflow:hidden}
+.gallery img{aspect-ratio:4/3;object-fit:cover;width:100%;transition:transform .25s}
+.gallery button:hover img{transform:scale(1.03)}
+.gallery figcaption{font-size:.8rem;color:var(--muted)}
+
+/* だより */
+.news{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.news li{display:grid;grid-template-columns:7.5em 1fr;gap:6px 20px;padding:18px 0;border-bottom:1px solid var(--line)}
+.news time{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.9rem}
+.news .body{display:flex;flex-direction:column;gap:6px;min-width:0}
+.news-detail{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+.news-detail > *{min-width:0}
+
+/* お問い合わせ */
+.contact{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.contact > *{min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px;display:flex;flex-direction:column;gap:12px}
+.pending{color:var(--mikan);font-weight:700}
+
+footer.site{background:var(--sea);color:var(--surface)}
+footer.site .wrap{padding-block:28px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:.85rem}
+footer.site a{color:var(--surface)}
+
+/* 拡大表示 */
+.lightbox{position:fixed;inset:0;background:rgba(5,12,15,.9);z-index:20;display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.lightbox img{max-height:100%;max-width:100%;object-fit:contain}
+.lightbox button{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:calc(12px + env(safe-area-inset-right,0px));background:#fff;color:#111;border:0;border-radius:999px;padding:8px 16px;font:inherit;font-weight:700;cursor:pointer}
+
+@media (max-width:820px){
+  .lead,.two,.news-detail,.contact{grid-template-columns:1fr}
+  .missions{grid-template-columns:1fr 1fr}
+  .koyomi{grid-template-columns:1fr 1fr}
+  .wisdom{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .course-cards,.missions,.koyomi,.rules{grid-template-columns:1fr}
+  .course{padding:18px 14px}
+  .news li{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="proto"><div class="wrap">試作版です。文章・写真・連絡先は地域の皆さまと確認中のため、内容が変わることがあります。</div></div>
+
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="#home"><b>蔵小校区ふるさと振興会</b><small>蔵貫・蔵貫浦｜西予市三瓶町</small></a>
+    <nav class="menu" aria-label="メニュー">
+      <ul>
+        <li><a href="#home">ホーム</a></li>
+        <li><a href="#footpath">フットパス</a></li>
+        <li><a href="#bousai">防災と歴史</a></li>
+        <li><a href="#koyomi">こよみ</a></li>
+        <li><a href="#katsudo">体験・活動</a></li>
+        <li><a href="#photos">写真</a></li>
+        <li><a href="#dayori">振興会だより</a></li>
+        <li><a href="#contact">お問い合わせ</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ===================== ホーム ===================== -->
+<section class="page" id="p-home" data-page="home" style="padding-top:0">
+  <div class="hero">
+    <img src="img/sunset-river.jpg" alt="三島川の河口から見た夕焼けの宇和海">
+    <span class="credit">三島川河口の夕焼け</span>
+    <div class="over"><div class="wrap">
+      <span class="hero-org">蔵小校区ふるさと振興会</span>
+      <h1>蔵貫・蔵貫浦</h1>
+      <p>海と川と段々畑のまち。歩いて楽しみ、歩いて知り、歩いて備える。</p>
+    </div></div>
+  </div>
+
+  <div class="wrap">
+    <div class="lead" style="margin-top:40px">
+      <div class="stack prose">
+        <span class="eyebrow">蔵小校区について</span>
+        <h2>宇和海に面した、浜と山の集落</h2>
+        <p>蔵小校区は、西予市三瓶町の三瓶湾のなかほど、三島川が宇和海に注ぐあたりの地域です。海に面した「蔵貫浦（くらぬきうら）」と、川をさかのぼった山あいの「蔵貫（くらぬき）」の二つの地区からなります。江戸時代には蔵貫村が宇和島藩、蔵貫浦が吉田藩に分かれていましたが、三島神社の秋祭りは今も浦と村がいっしょに行っています。</p>
+        <p>2026年、地域の皆さんと西予市、愛媛大学が一緒に「蔵貫フットパス」をつくりました。神社やお寺、めだかの里をめぐりながら、避難場所の位置も自然に覚えられるコースです。</p>
+      </div>
+      <dl class="facts">
+        <dt>場所</dt><dd>愛媛県西予市三瓶町 蔵貫・蔵貫浦</dd>
+        <dt>拠点</dt><dd>蔵貫地域づくり活動センター（駐車場・トイレあり）</dd>
+        <dt>バス</dt><dd>路線バス「蔵貫」停留所（八幡浜・下泊方面）</dd>
+        <dt>コース</dt><dd>蔵貫浦周辺コース／蔵王公園・ほたるの里コース</dd>
+        <dt>運営</dt><dd>蔵小校区ふるさと振興会</dd>
+      </dl>
+    </div>
+
+    <figure class="aerial">
+      <img src="img/aerial-ura.jpg" alt="上空から見た蔵貫浦。左に三島川と宇和海、中央に家並み、右に緑の山">
+      <figcaption>上空から見た蔵貫浦（2024年8月 ドローン撮影）。左手が三島川の河口と宇和海、奥へ続くのが三瓶湾です。</figcaption>
+    </figure>
+
+    <div class="block">
+      <div class="block-head"><h2>フットパスのコース</h2><a class="more" href="#footpath">コースの詳細を見る</a></div>
+      <div class="course-cards">
+        <a class="ccard" href="#footpath">
+          <img src="img/sup.jpg" alt="蔵貫浦の浜でのSUPの様子">
+          <div class="body">
+            <span class="eyebrow">コース 1</span>
+            <h3>蔵貫浦周辺コース</h3>
+            <p>港町・蔵貫浦の暮らしと自然を歩く</p>
+            <div class="meta"><span>約2.4km</span><span>約60分</span><span>立ち寄り6か所</span></div>
+          </div>
+        </a>
+        <a class="ccard" href="#footpath">
+          <img src="img/koinobori.jpg" alt="蔵王公園の龍王池に飾られた鯉のぼり">
+          <div class="body">
+            <span class="eyebrow">コース 2</span>
+            <h3>蔵王公園・ほたるの里コース</h3>
+            <p>蔵王公園やご神木、ほたるをめぐる</p>
+            <div class="meta"><span>約4.3km</span><span>約60分</span><span>立ち寄り8か所</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><h2>歩きながら、地域を守り・つくる6つの活動</h2><a class="more" href="#katsudo">体験・活動へ</a></div>
+      <p class="prose">蔵貫フットパスでは、歩くついでに地域の手入れや防災に役立つ「ミッション」に取り組みます。</p>
+      <ul class="missions" style="margin:0;padding:0" id="mission-list"></ul>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><h2>振興会だより</h2><a class="more" href="#dayori">一覧を見る</a></div>
+      <ul class="news" id="news-home"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== フットパス ===================== -->
+<section class="page" id="p-footpath" data-page="footpath" hidden>
+  <div class="wrap">
+    <div class="page-head">
+      <span class="eyebrow">KURANUKI FOOT PATH</span>
+      <h2>蔵貫フットパス</h2>
+      <p>フットパスは、地域にもともとある道を歩きながら、景色や暮らし、歴史を楽しむ散策路です。蔵貫フットパスのコースには、立ち寄りどころと一緒に緊急避難場所や避難所が入っています。歩くうちに「いざというとき、どこへ逃げるか」がわかるようにしています。</p>
+    </div>
+
+    <div class="course" id="course-hama">
+      <div class="course-top">
+        <div class="stack" style="gap:4px">
+          <span class="eyebrow">コース 1｜スタート・ゴール：蔵貫地域づくり活動センター</span>
+          <h3 style="font-size:1.5rem">蔵貫浦周辺コース</h3>
+          <p>港町・蔵貫浦の暮らしと自然を歩く</p>
+        </div>
+        <div class="stat"><div><small>距離</small><strong>約2.4km</strong></div><div><small>時間</small><strong>約60分</strong></div></div>
+      </div>
+      <figure class="mapfig">
+        <button type="button" data-zoom="map/hama-2.png" aria-label="蔵貫浦周辺コースの地図を拡大"><img src="map/hama-2.png" alt="蔵貫浦周辺コースのマップ。活動センターから三島神社、金光寺、砂浜、めだかの学校、あじさいロードをめぐる赤いルート"></button>
+        <figcaption>地図をタップすると拡大します。時間は見学・作業時間を含みます。</figcaption>
+      </figure>
+      <ol class="spots" id="spots-hama"></ol>
+    </div>
+
+    <div class="course" id="course-zao">
+      <div class="course-top">
+        <div class="stack" style="gap:4px">
+          <span class="eyebrow">コース 2｜スタート：蔵王公園　ゴール：蔵貫地域づくり活動センター</span>
+          <h3 style="font-size:1.5rem">蔵王公園・ほたるの里コース</h3>
+          <p>蔵王公園やご神木、ほたるをめぐる</p>
+        </div>
+        <div class="stat"><div><small>距離</small><strong>約4.3km</strong></div><div><small>時間</small><strong>約60分</strong></div></div>
+      </div>
+      <figure class="mapfig">
+        <button type="button" data-zoom="map/zao-2.png" aria-label="蔵王公園・ほたるの里コースの地図を拡大"><img src="map/zao-2.png" alt="蔵王公園・ほたるの里コースのマップ。蔵王公園からほたるの里、善福禅寺、高神様のナギ、めだかの学校を経て活動センターへ向かう赤いルート"></button>
+        <figcaption>地図をタップすると拡大します。時間は見学・作業時間を含みます。</figcaption>
+      </figure>
+      <ol class="spots" id="spots-zao"></ol>
+    </div>
+
+    <div class="block">
+      <h2>フットパスのルール</h2>
+      <ol class="rules">
+        <li>川・水路・海・道ばたに、ゴミをポイ捨てしないようにしましょう。</li>
+        <li>メダカなど水辺の生き物や、田畑の作物・草花を、勝手に採取するのはやめましょう。</li>
+        <li>壁画・石碑・案内板は地域の宝物です。落書きや傷つけはやめましょう。</li>
+        <li>地域の方にあいさつをして、暮らしの迷惑にならないよう歩きましょう。</li>
+        <li>避難場所や避難路の位置を確認し、暗くなる前に歩き終えましょう。</li>
+        <li>ご神木や境内の木は信仰の対象です。傷つけたり枝や葉を取ったりせず、見守りましょう。</li>
+      </ol>
+    </div>
+
+    <div class="block">
+      <h2>参加・ガイドのお申込み</h2>
+      <div class="card prose">
+        <p>地域の方がガイドとしてご案内する体験会を行っています。申込み方法・受付期限・参加費は<span class="pending">地域の皆さまと調整中</span>です。決まりしだい、このページと「振興会だより」でお知らせします。</p>
+        <p><a href="#contact">お問い合わせ先を見る</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 防災と歴史 ===================== -->
+<section class="page" id="p-bousai" data-page="bousai" hidden>
+  <div class="wrap">
+    <div class="page-head">
+      <span class="eyebrow">歩いて知る</span>
+      <h2>蔵小校区の防災と歴史</h2>
+      <p>蔵貫・蔵貫浦は、海と川と急な山にはさまれた地域です。これまでに津波、豪雨による山崩れ、川の増水、大火を経験してきました。その記録と、昔の人の知恵を知ってから歩くと、同じ道がちがって見えてきます。</p>
+    </div>
+
+    <figure class="aerial" style="margin-top:0;margin-bottom:40px">
+      <img src="img/aerial-kakou.jpg" alt="上空から見た三島川の河口と漁港、その周りに広がる家並みと背後の山">
+      <figcaption>三島川の河口と漁港（2024年8月 ドローン撮影）。河口のまわりの低い土地に家が集まり、すぐ後ろに山がせまっています。津波のときは海と川から離れ、山側の高いところへ逃げることになります。</figcaption>
+    </figure>
+
+    <div class="two">
+      <div class="stack">
+        <h3>蔵貫・蔵貫浦で起きた災害の記録</h3>
+        <ol class="timeline">
+          <li class="disaster"><time>1854年（安政元年）</time><b>安政の大地震による津波</b><p>津波が蔵貫に押し寄せた記録があり、当時の浸水域を示す図が三瓶町誌に残っています。将来の南海トラフ地震を考えるうえでの先例です。</p><span class="src">出典：三瓶町誌 上巻</span></li>
+          <li class="disaster"><time>1882年・1926年</time><b>蔵貫浦の大火</b><p>明治15年に20戸、大正15年に22戸が焼けました。昭和2年にも出火の記録があります。家が密集した浦の集落では、火事も大きな災害でした。</p><span class="src">出典：三瓶町誌 上巻</span></li>
+          <li class="disaster"><time>1943年7月（昭和18年）</time><b>記録的な豪雨による山崩れ</b><p>大規模な山崩れで多くの家屋が土砂に押し流されました。婦人会・青年団が総出で復旧にあたりました。昭和50年代には、墓地や寺の裏の山すそで崩壊を防ぐ工事が行われています。</p><span class="src">出典：三瓶町誌 上巻</span></li>
+          <li class="disaster"><time>2018年7月（平成30年）</time><b>西日本豪雨</b><p>三島川が増水し、河口近くから上流まで数か所で護岸が壊れました。現在は復旧しています。</p><span class="src">出典：愛媛県西予土木事務所の資料</span></li>
+          <li><time>2026年</time><b>事前復興計画とフットパス</b><p>南海トラフ巨大地震に備えて、地区・西予市・愛媛大学で事前復興計画をつくりました。フットパスづくりはその取り組みの一つです。</p><span class="src">出典：三瓶南地域事前復興まちづくり計画、愛媛新聞（2026年11月4日）</span></li>
+        </ol>
+      </div>
+      <div class="stack">
+        <div class="photo-pair">
+          <figure><img src="img/flood-river.jpg" alt="増水して濁流が流れる三島川"><figcaption>増水した三島川</figcaption></figure>
+          <figure><img src="img/flood-damage.jpg" alt="増水で橋に流木や草が引っかかった三島川"><figcaption>橋に流木や草が詰まった様子</figcaption></figure>
+        </div>
+        <div class="note">フットパスのミッション「三島川の草引き・清掃」は、こうした流木やゴミの詰まりによる氾濫を防ぐための、ふだんからできる防災です。</div>
+        <h3 style="margin-top:12px">昔の人の知恵</h3>
+        <div class="wisdom">
+          <article><h4 style="margin:0">風除け祭り</h4><p>三島神社の樹齢約500年のビャクシン（市指定天然記念物）に風の神を迎え、二百十日の7日前に作物を台風から守るよう祈った祭りです。今は行われていません。</p></article>
+          <article><h4 style="margin:0">ナギの葉のお守り</h4><p>高神様のナギ（市指定天然記念物）の葉を、鏡の裏や「ます袋」に入れて、近年まで災難よけにしていました。</p></article>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2>コース上の避難場所</h2>
+      <p class="prose">歩きながら場所を確かめておきましょう。地震のあと津波が来るおそれがあるときは、海や川から離れて高いところへ逃げてください。</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>場所</th><th>種類</th><th>通るコース</th></tr></thead>
+          <tbody>
+            <tr><td>金光寺</td><td><span class="tag safe">指定緊急避難場所（津波一時避難場所）</span></td><td>蔵貫浦周辺コース</td></tr>
+            <tr><td>善福禅寺の上</td><td><span class="tag safe">指定緊急避難場所（津波一時避難場所）</span></td><td>蔵王公園・ほたるの里コース</td></tr>
+            <tr><td>蔵王公園付近</td><td><span class="tag safe">指定緊急避難場所（津波一時避難場所）</span></td><td>蔵王公園・ほたるの里コース</td></tr>
+            <tr><td>蔵貫地域づくり活動センター</td><td>災害時の避難所</td><td>両コース</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="src">このほか、神明神社付近の高台、川原集会所の上、三瓶蔵貫地区体育館（旧蔵貫小学校）なども避難場所・避難所に指定されています。最新の情報は西予市のハザードマップや防災情報で確認してください。<span class="pending">（地図への掲載範囲は地域と確認中）</span></p>
+    </div>
+
+    <div class="block">
+      <h2>蔵貫・蔵貫浦のあゆみ</h2>
+      <div class="two">
+        <ol class="timeline">
+          <li><time>768年（神護景雲2年）</time><b>三島神社の創建と伝わる</b><p>山の神をまつって建てられたと伝えられています。室町時代の末に兵火で全焼しましたが、二人の村人がご神体を守り出しました。その子孫は今も祭りで弓矢の役を務めています。</p></li>
+          <li><time>1657年（明暦3年）</time><b>村と浦が二つの藩に分かれる</b><p>蔵貫村は宇和島藩、蔵貫浦は吉田藩に。秋祭りを別々にしなければならなくなったとき、村人は和歌を藩に送り、浦と村の同時開催を認めてもらったといわれます。</p></li>
+          <li><time>1769年（明和6年）</time><b>極山（きわめやま）の境界争い</b><p>草刈り場の極山をめぐり、宇和町側の東山田村と争いました。その絵図と裁定書は町指定文化財として、歴代の区長が引き継いできました。</p></li>
+          <li><time>明治〜昭和</time><b>海と山の仕事</b><p>塩田、製糸工場、マンガン鉱山、温州みかんの段々畑、真珠やウナギの養殖など、時代ごとにさまざまな仕事が地区を支えてきました。</p></li>
+        </ol>
+        <div class="stack">
+          <h3>浜の子どもたちの記憶</h3>
+          <p>昭和30年代ごろまで、蔵貫浦の子どもたちは、夏は浜で船の底をくぐる潜水競争をし、三島川でツガネ（モクズガニ）やエビをとって遊びました。正月3日の「天神祭り」や11月の「亥の子」は、子どもだけで計画して行う行事でした。亥の子は今も続いています。</p>
+          <span class="src">出典：えひめの記憶「三島川河口の子どもたち－三瓶町蔵貫浦－」、三瓶町誌 上巻</span>
+          <div class="photo-pair">
+            <figure><img src="img/matsuri-hama.jpg" alt="浜宮での秋祭りの様子"><figcaption>秋祭り（浜宮）</figcaption></figure>
+            <figure><img src="img/matsuri1.jpg" alt="秋祭りで練り歩く人びと"><figcaption>秋祭りの練り</figcaption></figure>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== こよみ ===================== -->
+<section class="page" id="p-koyomi" data-page="koyomi" hidden>
+  <div class="wrap">
+    <div class="page-head">
+      <span class="eyebrow">四季</span>
+      <h2>蔵小校区のこよみ</h2>
+      <p>季節ごとの行事と見どころです。日付は年によって変わることがあります。<span class="pending">（地域の方に確認中）</span></p>
+    </div>
+    <div class="koyomi">
+      <div class="season"><h3>春</h3><img src="img/koinobori.jpg" alt="蔵王公園の鯉のぼり"><dl>
+        <div><dt>4月9日</dt><dd>三島神社 春祭</dd></div>
+        <div><dt>4月下旬〜5月中旬</dt><dd>蔵王公園の龍王池に鯉のぼり</dd></div>
+        <div><dt>春</dt><dd>あじさいロードの芝桜</dd></div>
+      </dl></div>
+      <div class="season"><h3>夏</h3><img src="img/ajisai.jpg" alt="三島川沿いに咲くあじさい"><dl>
+        <div><dt>6月ごろ</dt><dd>あじさいロードのあじさいが満開</dd></div>
+        <div><dt>初夏</dt><dd>ほたるの里でホタルが舞う</dd></div>
+        <div><dt>夏</dt><dd>蔵貫浦の浜でSUP集会</dd></div>
+        <div><dt>夏</dt><dd>盆踊り</dd></div>
+      </dl></div>
+      <div class="season"><h3>秋</h3><img src="img/matsuri1.jpg" alt="三島神社の秋祭り"><dl>
+        <div><dt>10月14日・15日</dt><dd>三島神社の例祭・神幸祭（市指定無形民俗文化財「蔵貫三島神社の秋祭り」）。子どもの大名行列「お練り」や牛鬼</dd></div>
+        <div><dt>10月31日ごろ</dt><dd>水路の送水が止まり、蔵貫メダカの救出</dd></div>
+        <div><dt>11月の亥の日</dt><dd>亥の子（子どもたちが亥の子石をついて家々を回る）</dd></div>
+        <div><dt>秋</dt><dd>コスモス畑</dd></div>
+      </dl></div>
+      <div class="season"><h3>冬</h3><img src="img/illumi.jpg" alt="活動センターのイルミネーション"><dl>
+        <div><dt>12月初旬〜1月中旬</dt><dd>活動センターに約3万球のイルミネーション</dd></div>
+        <div><dt>冬</dt><dd>蔵貫浦の砂浜で「だるま夕日」</dd></div>
+      </dl></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 体験・活動 ===================== -->
+<section class="page" id="p-katsudo" data-page="katsudo" hidden>
+  <div class="wrap">
+    <div class="page-head">
+      <span class="eyebrow">体験</span>
+      <h2>歩きながら、地域を守り・つくる</h2>
+      <p>蔵貫フットパスの体験会では、歩く途中で6つのミッションに取り組みます。地域の手入れがそのまま防災や地域づくりにつながるようにしています。</p>
+    </div>
+    <ul class="missions" style="margin:0;padding:0" id="mission-list-2"></ul>
+
+    <div class="block">
+      <h2>活動の様子</h2>
+      <div class="gallery">
+        <figure><button type="button" data-zoom="img/zao-seibi.jpg"><img src="img/zao-seibi.jpg" alt="蔵王公園を整備する地域の方々"></button><figcaption>蔵王公園の整備</figcaption></figure>
+        <figure><button type="button" data-zoom="img/hekiga.jpg"><img src="img/hekiga.jpg" alt="ほたるの里の道路沿いの壁画"></button><figcaption>ほたるの里の壁画</figcaption></figure>
+        <figure><button type="button" data-zoom="img/medaka.jpg"><img src="img/medaka.jpg" alt="めだかの里の水車"></button><figcaption>めだかの里</figcaption></figure>
+        <figure><button type="button" data-zoom="img/sup.jpg"><img src="img/sup.jpg" alt="蔵貫浦の浜でSUPを楽しむ人びと"></button><figcaption>SUP集会</figcaption></figure>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2>体験会への参加</h2>
+      <div class="card prose"><p>団体での体験や、人数・時期・内容のご相談は<a href="#contact">お問い合わせ</a>からどうぞ。<span class="pending">（受付方法は調整中）</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 写真 ===================== -->
+<section class="page" id="p-photos" data-page="photos" hidden>
+  <div class="wrap">
+    <div class="page-head">
+      <span class="eyebrow">ギャラリー</span>
+      <h2>蔵小校区の写真</h2>
+      <p>写真をタップすると大きく表示されます。<span class="pending">（掲載の許可は確認中）</span></p>
+    </div>
+    <div class="gallery" id="gallery"></div>
+  </div>
+</section>
+
+<!-- ===================== 振興会だより ===================== -->
+<section class="page" id="p-dayori" data-page="dayori" hidden>
+  <div class="wrap">
+    <div class="page-head">
+      <span class="eyebrow">お知らせ・レポート</span>
+      <h2>振興会だより</h2>
+    </div>
+    <ul class="news" id="news-all"></ul>
+
+    <article class="block" id="report-1031">
+      <span class="eyebrow">レポート</span>
+      <h2>愛媛大学の学生ら約60人がフットパスを体験しました</h2>
+      <div class="news-detail">
+        <div class="stack prose">
+          <p>2026年10月31日、愛媛大学の学生ら約60人が、地域のガイドの皆さんと一緒に二つのコースを歩きました。いくつかの班に分かれ、途中で水路のメダカ探しや海岸清掃などのミッションにも取り組みました。</p>
+          <p>ガイドを務めた地域の方からは「こんなに大勢を案内するのは初めてで楽しい」「フットパスがあれば、観光客により楽しく滞在してもらえると思う。防災にもつながればいい」という声がありました。</p>
+          <p>この取り組みは2026年11月4日の愛媛新聞で紹介されました。</p>
+        </div>
+        <div class="photo-pair">
+          <figure><img src="img/medaka.jpg" alt="めだかの里"><figcaption>めだかの里</figcaption></figure>
+          <figure><img src="img/zenpukuji.jpg" alt="善福禅寺の本堂"><figcaption>善福禅寺</figcaption></figure>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ===================== お問い合わせ ===================== -->
+<section class="page" id="p-contact" data-page="contact" hidden>
+  <div class="wrap">
+    <div class="page-head">
+      <span class="eyebrow">CONTACT</span>
+      <h2>お問い合わせ・お申込み</h2>
+      <p>フットパスの体験、ガイドの依頼、取材などのお問い合わせはこちらへ。</p>
+    </div>
+    <div class="contact">
+      <div class="card">
+        <h3>運営</h3>
+        <p>蔵小校区ふるさと振興会</p>
+        <p>拠点：蔵貫地域づくり活動センター<br>愛媛県西予市三瓶町蔵貫浦 <span class="pending">（番地を確認中）</span></p>
+        <p>電話：<span class="pending">確認中</span><br>メール：<span class="pending">確認中</span></p>
+      </div>
+      <div class="card">
+        <h3>協力</h3>
+        <p>西予市／愛媛大学</p>
+        <h3 style="margin-top:8px">お申込みフォーム</h3>
+        <p>本番のサイトでは、ここに申込みフォーム（Googleフォーム）へのボタンを置く予定です。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>蔵小校区ふるさと振興会｜愛媛県西予市三瓶町 蔵貫・蔵貫浦</span>
+    <span>試作版 2026年11月｜作成協力：愛媛大学</span>
+  </div>
+</footer>
+
+<div class="lightbox" id="lightbox" hidden>
+  <button type="button" id="lb-close">閉じる</button>
+  <img id="lb-img" alt="">
+</div>
+
+<script>
+const MISSIONS=[
+  ["三島川の草引き・清掃","川の雑草やゴミを取り除き、大雨のときに流木やゴミが詰まって川があふれるのを防ぎます。ふだんからできる防災です。","蔵貫浦周辺コース"],
+  ["海岸清掃（ビーチクリーン）","砂浜や海岸沿いを歩きながらゴミを拾い、浜をきれいにします。","蔵貫浦周辺コース"],
+  ["ほたるの里の壁画塗り","古くなった道路沿いの壁画を洗ってから、ペンキを塗り直します。","蔵王公園・ほたるの里コース"],
+  ["水路清掃と蔵貫メダカ救出","10月31日ごろは水路の送水が止まり水が減る時期。水たまりに集まった蔵貫メダカを救い出し、草を抜きます。","両コース共通"],
+  ["かまぼこ板の方言書き","「ギャラリーしろかわ」から提供されたかまぼこ板に、三瓶の方言を書きます。","両コース共通"],
+  ["空き缶ソーラーランタン","空き缶でソーラーランタンを作り、夜に暗くなる避難路に置いて、明るさを確かめます。","両コース共通"]
+];
+const SPOTS={
+  hama:[
+    ["蔵貫地域づくり活動センター","B-2",["地域づくり活動や交流の拠点","災害時の避難所","冬（12月初旬〜1月中旬ごろ）には約3万球のイルミネーション"],"約130m／約3分",""],
+    ["三島神社","B-2",["創建1300年以上と伝わる神社","樹齢約500年のイブキビャクシン（市指定天然記念物）","市指定無形民俗文化財「蔵貫三島神社の秋祭り」"],"約380m／約9分",""],
+    ["金光寺","B-1",["二度の火災を経て昭和34年に再建された寺","本堂へ続く急な石段"],"約580m／約10分","指定緊急避難場所（津波一時避難場所）"],
+    ["蔵貫浦の砂浜","A-2",["夕日の絶景スポット。冬は「だるま夕日」が見られる","夏はSUP集会でにぎわう","穏やかな宇和海を望む浜辺"],"約1,030m／約20分",""],
+    ["めだかの学校","C-2",["地域の皆さんが守り育てる憩いの場","蔵貫の在来メダカなど水辺の生き物を観察できる","全国農村アメニティ・コンクール最優秀賞（平成11年）"],"",""],
+    ["あじさいロード","C-2",["三島川沿いのレンガ調の散策路","あじさいや芝桜など季節の花","住民に親しまれるウォーキングコース"],"活動センターまで約210m／約5分",""]
+  ],
+  zao:[
+    ["蔵王公園（スタート）","C-3",["地元の皆さんが整備した親水公園","龍王池のそばに龍神様をまつる祠","4月下旬〜5月中旬は鯉のぼりが龍王池を彩る"],"約1,230m／約18分","指定緊急避難場所（津波一時避難場所）"],
+    ["ほたるの壁画","D-3",["小学生が描いたほたるの壁画"],"",""],
+    ["ほたるの里","D-3",["ホタルが舞うスポット","詩人・宮中雲子の詩碑、東屋、水車の跡"],"約2,200m／約30分",""],
+    ["善福禅寺","A-2",["臨済宗妙心寺派の禅寺","約600年前、応永年間の創建と伝わる"],"約120m／約3分","指定緊急避難場所（津波一時避難場所）"],
+    ["高神様のナギ","B-3",["三瓶町内でただ一本のナギ（市指定天然記念物）","高神様の境内にある、災難よけの神木"],"約560m／約12分",""],
+    ["めだかの学校","A-2",["蔵貫の在来メダカなど水辺の生き物を観察できる"],"",""],
+    ["あじさいロード","A-2",["6月ごろはあじさいが満開"],"約250m／約5分",""],
+    ["蔵貫地域づくり活動センター（ゴール）","A-2",["地域づくり活動や交流の拠点","災害時の避難所"],"",""]
+  ]
+};
+const NEWS=[
+  ["2026-11-04","愛媛新聞で蔵貫フットパスが紹介されました","観光と防災を両立するフットパスとして、10月31日の体験会の様子が掲載されました。","#dayori"],
+  ["2026-10-31","愛媛大学の学生ら約60人がフットパスを体験しました","地域のガイドの皆さんと二つのコースを歩き、メダカ探しや海岸清掃のミッションに取り組みました。","#dayori"],
+  ["2026-07-18","高川地区（城川町）のフットパスを体験しました","同じ西予市の先輩、高川フットパスを歩き、コースづくりの参考にしました。","#dayori"]
+];
+const PHOTOS=[
+  ["aerial-ura","上空から見た蔵貫浦"],["aerial-kakou","三島川の河口と漁港（上空から）"],["sunset-river","三島川河口の夕焼け"],["bridge","橋から海へ向かう夕景"],["amanogawa","星空"],["ajisai","あじさいロード"],
+  ["cosmos","コスモス畑"],["hotaru","ほたるの里"],["koinobori","蔵王公園の鯉のぼり"],["nagi","ナギの葉"],
+  ["matsuri-hama","秋祭り（浜宮）"],["matsuri1","秋祭りの練り"],["bonodori","盆踊り"],["illumi","活動センターのイルミネーション"],
+  ["sup","SUP集会"],["medaka","めだかの里"],["zenpukuji","善福禅寺"],["hekiga","ほたるの壁画"],["satsuma","サツマニシキ（蛾）"]
+];
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function missionsHTML(){return MISSIONS.map((m,i)=>`<li><span class="num">${["Ⅰ","Ⅱ","Ⅲ","Ⅳ","Ⅴ","Ⅵ"][i]}</span><b>${m[0]}<span class="where">${m[2]}</span></b><p>${m[1]}</p></li>`).join("")}
+document.getElementById("mission-list").innerHTML=missionsHTML();
+document.getElementById("mission-list-2").innerHTML=missionsHTML();
+
+for(const key of ["hama","zao"]){
+  document.getElementById("spots-"+key).innerHTML=SPOTS[key].map((s,i)=>`
+    <li class="spot"><span class="pin">${i+1}</span>
+      <h4>${esc(s[0])}<span class="grid-ref">地図 ${s[1]}</span></h4>
+      ${s[4]?`<div class="tags"><span class="tag safe">${esc(s[4])}</span></div>`:""}
+      <div><ul>${s[2].map(x=>`<li>${esc(x)}</li>`).join("")}</ul>${s[3]?`<span class="leg">次の地点まで ${esc(s[3])}</span>`:""}</div>
+    </li>`).join("");
+}
+function fmt(d){const [y,m,dd]=d.split("-");return `${y}年${+m}月${+dd}日`}
+const newsHTML=list=>list.map(n=>`<li><time datetime="${n[0]}">${fmt(n[0])}</time><div class="body"><a href="${n[3]}"><b>${esc(n[1])}</b></a><p>${esc(n[2])}</p></div></li>`).join("");
+document.getElementById("news-home").innerHTML=newsHTML(NEWS.slice(0,2));
+document.getElementById("news-all").innerHTML=newsHTML(NEWS);
+document.getElementById("gallery").innerHTML=PHOTOS.map(p=>`<figure><button type="button" data-zoom="img/${p[0]}.jpg"><img loading="lazy" src="img/${p[0]}.jpg" alt="${esc(p[1])}"></button><figcaption>${esc(p[1])}</figcaption></figure>`).join("");
+
+/* ページ切り替え */
+const PAGES=["home","footpath","bousai","koyomi","katsudo","photos","dayori","contact"];
+function show(){
+  const h=(location.hash||"#home").slice(1);
+  const name=PAGES.includes(h)?h:"home";
+  document.querySelectorAll("section.page").forEach(s=>s.hidden=s.dataset.page!==name);
+  document.querySelectorAll("nav.menu a").forEach(a=>{
+    if(a.getAttribute("href")==="#"+name)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current");
+  });
+  const cur=document.querySelector('nav.menu a[aria-current="page"]');
+  if(cur)cur.scrollIntoView({block:"nearest",inline:"center"});
+  window.scrollTo(0,0);
+}
+window.addEventListener("hashchange",show);show();
+
+/* 拡大表示 */
+const lb=document.getElementById("lightbox"),lbImg=document.getElementById("lb-img");
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-zoom]");
+  if(b){lbImg.src=b.dataset.zoom;lbImg.alt=b.querySelector("img")?.alt||"";lb.hidden=false;document.getElementById("lb-close").focus();}
+});
+function closeLb(){lb.hidden=true;lbImg.src="";}
+document.getElementById("lb-close").addEventListener("click",closeLb);
+lb.addEventListener("click",e=>{if(e.target===lb)closeLb()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!lb.hidden)closeLb()});
+</script>
+
+</html>
