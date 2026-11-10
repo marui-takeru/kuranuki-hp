@@ -94,6 +94,10 @@ main section.page[hidden]{display:none}
 .missions p{font-size:.9rem;color:var(--muted)}
 .missions .where{font-size:.75rem;color:var(--sea);display:block}
 
+.aerial{margin:48px 0 0;display:flex;flex-direction:column;gap:8px}
+.aerial img{width:100%;aspect-ratio:21/9;object-fit:cover;border-radius:10px}
+.aerial figcaption{font-size:.85rem;color:var(--muted)}
+@media (max-width:560px){.aerial img{aspect-ratio:4/3}}
 .block{margin-top:56px;display:flex;flex-direction:column;gap:20px}
 .block-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
 .more{font-size:.9rem}
@@ -254,6 +258,11 @@ footer.site a{color:var(--surface)}
       </dl>
     </div>
 
+    <figure class="aerial">
+      <img src="img/aerial-ura.jpg" alt="上空から見た蔵貫浦。左に三島川と宇和海、中央に家並み、右に緑の山">
+      <figcaption>上空から見た蔵貫浦（2024年8月 ドローン撮影）。左手が三島川の河口と宇和海、奥へ続くのが三瓶湾です。</figcaption>
+    </figure>
+
     <div class="block">
       <div class="block-head"><h2>フットパスのコース</h2><a class="more" href="#footpath">コースの詳細を見る</a></div>
       <div class="course-cards">
@@ -362,6 +371,11 @@ footer.site a{color:var(--surface)}
       <h2>蔵貫の防災と歴史</h2>
       <p>蔵貫は、海と川と急な山にはさまれた地区です。これまでに津波、豪雨による山崩れ、川の増水、大火を経験してきました。その記録と、昔の人の知恵を知ってから歩くと、同じ道がちがって見えてきます。</p>
     </div>
+
+    <figure class="aerial" style="margin-top:0;margin-bottom:40px">
+      <img src="img/aerial-kakou.jpg" alt="上空から見た三島川の河口と漁港、その周りに広がる家並みと背後の山">
+      <figcaption>三島川の河口と漁港（2024年8月 ドローン撮影）。河口のまわりの低い土地に家が集まり、すぐ後ろに山がせまっています。津波のときは海と川から離れ、山側の高いところへ逃げることになります。</figcaption>
+    </figure>
 
     <div class="two">
       <div class="stack">
@@ -602,7 +616,7 @@ const NEWS=[
   ["2026-07-18","高川地区（城川町）のフットパスを体験しました","同じ西予市の先輩、高川フットパスを歩き、コースづくりの参考にしました。","#dayori"]
 ];
 const PHOTOS=[
-  ["sunset-river","三島川河口の夕焼け"],["bridge","橋から海へ向かう夕景"],["amanogawa","蔵貫の星空"],["ajisai","あじさいロード"],
+  ["aerial-ura","上空から見た蔵貫浦"],["aerial-kakou","三島川の河口と漁港（上空から）"],["sunset-river","三島川河口の夕焼け"],["bridge","橋から海へ向かう夕景"],["amanogawa","蔵貫の星空"],["ajisai","あじさいロード"],
   ["cosmos","コスモス畑"],["hotaru","ほたるの里"],["koinobori","蔵王公園の鯉のぼり"],["nagi","ナギの葉"],
   ["matsuri-hama","秋祭り（浜宮）"],["matsuri1","秋祭りの練り"],["bonodori","盆踊り"],["illumi","活動センターのイルミネーション"],
   ["sup","SUP集会"],["medaka","めだかの里"],["zenpukuji","善福禅寺"],["hekiga","ほたるの壁画"],["satsuma","サツマニシキ（蛾）"]
