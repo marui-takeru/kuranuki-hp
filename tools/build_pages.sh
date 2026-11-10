@@ -7,7 +7,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-HOLD="bonodori matsuri-hama matsuri1 sup zao-seibi"
+HOLD=""  # 2026-11-10 丸井さん確認により全写真掲載OK
 
 rm -rf img map
 mkdir -p img map
